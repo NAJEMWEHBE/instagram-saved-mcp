@@ -35,11 +35,10 @@ dev = ["pytest>=8.0"]
 [project.scripts]
 instagram-saved-mcp = "instagram_saved_mcp.server:main"
 
-# TODO: update these to your real repository before publishing.
 [project.urls]
-Homepage = "https://github.com/yourusername/instagram-saved-mcp"
-Repository = "https://github.com/yourusername/instagram-saved-mcp"
-Issues = "https://github.com/yourusername/instagram-saved-mcp/issues"
+Homepage = "https://github.com/NAJEMWEHBE/instagram-saved-mcp"
+Repository = "https://github.com/NAJEMWEHBE/instagram-saved-mcp"
+Issues = "https://github.com/NAJEMWEHBE/instagram-saved-mcp/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/instagram_saved_mcp"]
