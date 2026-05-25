@@ -1,80 +1,100 @@
+<div align="center">
+
 # instagram-saved-mcp
 
-An [MCP](https://modelcontextprotocol.io) server that makes your Instagram **Saved** posts available to any MCP-compatible AI assistant — Claude Desktop, Cursor, Codex, Cline, and others.
+**Your Instagram Saved posts, available to any AI assistant.**
 
-It reads your own **Instagram data export** locally, optionally enriches individual posts from their **public** page, and caches everything in a local SQLite file. No Instagram login, no API keys, no credentials stored anywhere.
+Read your Instagram data export locally, enrich posts from their public page, and search it all — from [Claude](https://claude.ai), Cursor, Codex, or your terminal. No login, no API keys, no data leaves your machine.
 
-## What it can do
+[![PyPI](https://img.shields.io/pypi/v/instagram-saved-mcp.svg)](https://pypi.org/project/instagram-saved-mcp/)
+[![Python](https://img.shields.io/pypi/pyversions/instagram-saved-mcp.svg)](https://pypi.org/project/instagram-saved-mcp/)
+[![Tests](https://github.com/NAJEMWEHBE/instagram-saved-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/NAJEMWEHBE/instagram-saved-mcp/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![MCP](https://img.shields.io/badge/MCP-server-blue.svg)](https://modelcontextprotocol.io)
 
-| Tool | Description |
-|------|-------------|
-| `list_collections()` | List your Saved collections and how many posts each has. |
-| `list_saved(collection?, limit?)` | List saved posts (URL, collection, saved-on date), newest first. |
-| `get_post(url)` | Fetch a public post's caption, author, hashtags, and image URL. Cached after first fetch. |
-| `search_saved(query)` | Search enriched posts by caption, hashtag, or author. |
-| `transcribe_post(url)` | **v0.2 — stub.** Will transcribe reels/videos (downloads media). Not active in v0.1. |
-| `refresh_index(zip_path)` | (Re)import an Instagram export ZIP/folder into the local index. |
-
-## Privacy
-
-- **Read-only of your own data.** The server parses the export *you* download from Instagram.
-- **No credentials.** `get_post` only fetches *public* post pages, anonymously.
-- **Local only.** Everything is cached in a single SQLite file on your machine (`~/.instagram-saved-mcp/cache.db` by default).
-
----
-
-## Step 1 — Export your Instagram data
-
-1. Instagram → **Settings → Accounts Center → Your information and permissions → Download your information**.
-2. Request a download of **Saved** (or everything), **Format: JSON**.
-3. When the email arrives, download the ZIP. You'll point the server at this file — no need to unzip it.
-
-The server reads `your_instagram_activity/saved/saved_posts.json` and (if present) `saved_collections.json` from inside it. A pre-extracted folder works too.
-
-## Step 2 — Install
-
-### Windows (one click)
-
-Download and run [`installers/install_windows.bat`](installers/install_windows.bat). It installs [`uv`](https://docs.astral.sh/uv/) if needed and registers the server in Claude Desktop automatically. Restart Claude Desktop when it finishes.
-
-### Any platform (manual)
-
-Install `uv` ([instructions](https://docs.astral.sh/uv/getting-started/installation/)), then add the config below to your client. `uvx` downloads and runs the server on demand — no separate install step.
+</div>
 
 ```bash
-# verify it resolves (optional)
-uvx instagram-saved-mcp
+uvx instagram-saved-mcp          # MCP server (what your AI client launches)
+uvx instagram-saved-mcp --help   # or use it straight from the terminal
 ```
 
-## Step 3 — Configure your MCP client
+## Contents
 
-All clients use the same command: `uvx instagram-saved-mcp`.
+- [Why](#why) · [Features](#features) · [Quickstart](#quickstart) · [CLI](#cli) · [Connect an AI client](#connect-an-ai-client) · [How it works](#how-it-works) · [Privacy](#privacy) · [Configuration](#configuration) · [Roadmap](#roadmap) · [Contributing](#contributing)
 
-**Claude Desktop** — `%APPDATA%\Claude\claude_desktop_config.json` (Windows) / `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS):
+## Why
+
+Instagram lets you *save* posts but gives you almost no way to use that pile — no search, no export, no API. Meanwhile your "Download your information" export contains every saved URL and collection. This server turns that export into a queryable local library your AI assistant (or your shell) can actually work with.
+
+## Features
+
+| | |
+|---|---|
+| **Bring your own export** | Reads the official Instagram data export — ZIP or extracted folder. |
+| **Collections, intact** | Merges `saved_posts.json` + `saved_collections.json`, labelling each post (or `All Posts`). |
+| **On-demand enrichment** | `get_post` pulls caption, author, hashtags, and image from the public page and caches it. |
+| **Local search** | Full-text-ish search over enriched captions, hashtags, and authors. |
+| **Two front ends** | Same logic as an MCP server *and* a terminal CLI. |
+| **Private by design** | No credentials, no uploads. One local SQLite file. |
+
+## Quickstart
+
+**1. Export your data.** Instagram → Settings → *Download your information* → request **Saved**, format **JSON**. Download the ZIP when it arrives (no need to unzip).
+
+**2. Install [uv](https://docs.astral.sh/uv/), then import:**
+
+```bash
+uvx instagram-saved-mcp refresh "path/to/instagram-export.zip"
+uvx instagram-saved-mcp collections
+```
+
+**3. Connect an AI client** (below) — or keep using the CLI.
+
+## CLI
+
+```text
+instagram-saved-mcp <command> [options]
+
+  serve                      Run the MCP server over stdio (default if no command)
+  refresh <path>             Import an export ZIP or folder
+  collections                List collections and post counts
+  list [--collection N]      List saved posts, newest first  [--limit N]
+  get <url>                  Fetch + cache one post's details
+  search <query>             Search enriched posts
+                             (--json on any data command for machine output)
+```
+
+```console
+$ instagram-saved-mcp list --collection Recipes --limit 3
+2024-03-09  Recipes              https://www.instagram.com/p/DVQtFLqEoFv/
+2024-02-28  Recipes              https://www.instagram.com/p/CzX12abQ9pL/
+2024-01-15  Recipes              https://www.instagram.com/reel/Cy88mn0gAbc/
+(3 posts)
+
+$ instagram-saved-mcp get https://www.instagram.com/p/DVQtFLqEoFv/
+https://www.instagram.com/p/DVQtFLqEoFv/
+  author     @chef
+  collection Recipes
+  hashtags   #pasta #weeknight
+  caption    The 10-minute pasta everyone keeps asking about...
+```
+
+## Connect an AI client
+
+All clients launch the same command: `uvx instagram-saved-mcp`.
+
+**Claude Desktop** — `%APPDATA%\Claude\claude_desktop_config.json` (Windows) / `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS). Windows users can just run [`installers/install_windows.bat`](installers/install_windows.bat).
 
 ```json
 {
   "mcpServers": {
-    "instagram-saved": {
-      "command": "uvx",
-      "args": ["instagram-saved-mcp"]
-    }
+    "instagram-saved": { "command": "uvx", "args": ["instagram-saved-mcp"] }
   }
 }
 ```
 
-**Cursor** — `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (project):
-
-```json
-{
-  "mcpServers": {
-    "instagram-saved": {
-      "command": "uvx",
-      "args": ["instagram-saved-mcp"]
-    }
-  }
-}
-```
+**Cursor** — `~/.cursor/mcp.json` (same JSON shape as above).
 
 **Codex CLI** — `~/.codex/config.toml`:
 
@@ -84,51 +104,54 @@ command = "uvx"
 args = ["instagram-saved-mcp"]
 ```
 
-Restart the client after editing its config.
+Restart the client, then ask it to `refresh_index` with your export path and explore.
 
-## Step 4 — First use
+### Tools exposed to the client
 
-In your assistant, import your export once, then explore:
+| Tool | Description |
+|------|-------------|
+| `list_collections()` | Collections and their post counts. |
+| `list_saved(collection?, limit?)` | Saved posts, newest first. |
+| `get_post(url)` | Caption, author, hashtags, image — cached after first fetch. |
+| `search_saved(query)` | Search enriched posts. |
+| `refresh_index(zip_path)` | Import / re-import an export. |
+| `transcribe_post(url)` | Reel transcription — **v0.2 stub** (downloads nothing yet). |
 
+## How it works
+
+```mermaid
+flowchart LR
+    ZIP["Instagram export<br/>(ZIP / folder)"] -->|refresh_index| P[parser]
+    URL["Public post URL"] -->|get_post| E[enricher]
+    P --> DB[("SQLite cache")]
+    E --> DB
+    DB --> S["server.py / cli.py<br/>(tools + error boundary)"]
+    S --> C["MCP client · terminal"]
 ```
-refresh_index("C:/Users/you/Downloads/instagram-export.zip")
-list_collections()
-list_saved(collection="Recipes")
-get_post("https://www.instagram.com/p/SHORTCODE/")
-search_saved("pasta")
-```
 
-`refresh_index` is also where you go after downloading a fresh export — it updates collections and saved dates without discarding captions you've already fetched.
+Layers stay isolated: `parser` is pure (no network, no DB), `enricher` only touches the network, `cache` only touches SQLite. `server.py` and `cli.py` orchestrate them and are the single place that turns typed errors into clean messages — a stack trace never reaches the client.
 
----
+## Privacy
 
-## Notes & limits
-
-- **`get_post` is best-effort.** Instagram frequently serves a login wall to anonymous requests. When that happens you'll get a clean message (`"error_type": "login_wall"`), not a crash — the rest of the server keeps working. When the page *is* served, captions/authors/images come from the page's Open Graph tags.
-- **Enrichment is on demand.** `list_saved` returns URLs immediately from the export; `search_saved` only covers posts you've enriched with `get_post`.
-- **`transcribe_post` is a v0.2 stub.** It downloads nothing in v0.1. The transcription stack (`yt-dlp` + `faster-whisper`) is an optional extra so the base install stays small:
-
-  ```bash
-  uvx instagram-saved-mcp[transcribe]
-  ```
+- **Read-only of your own data** — the export *you* download.
+- **No credentials, ever.** `get_post` fetches only *public* pages, anonymously, best-effort. When Instagram serves a login wall you get a clean message, not a crash.
+- **Local only** — one SQLite file (`~/.instagram-saved-mcp/cache.db` by default).
 
 ## Configuration
 
 | Environment variable | Purpose | Default |
 |----------------------|---------|---------|
-| `INSTAGRAM_SAVED_MCP_DB` | Path to the SQLite cache file. | `~/.instagram-saved-mcp/cache.db` |
-| `INSTAGRAM_SAVED_EXPORT` | If set and the DB is empty, auto-imports this export ZIP/folder on startup. | unset |
+| `INSTAGRAM_SAVED_MCP_DB` | SQLite cache location. | `~/.instagram-saved-mcp/cache.db` |
+| `INSTAGRAM_SAVED_EXPORT` | Auto-import this export on startup if the DB is empty. | unset |
 
-## Development
+## Roadmap
 
-```bash
-uv pip install -e ".[dev]"
-uv run pytest          # parser tests (no network)
-python -m build        # build sdist + wheel
-```
+- **v0.2** — `transcribe_post`: download a reel with `yt-dlp` and transcribe with `faster-whisper` (GPU with CPU fallback). Ships as an opt-in extra: `uvx instagram-saved-mcp[transcribe]`.
 
-Releases publish to PyPI automatically via GitHub Actions on a `v*` tag push (PyPI Trusted Publishing).
+## Contributing
+
+PRs welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). Tests run offline: `uv run pytest`. Changes are tracked in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+[MIT](LICENSE)

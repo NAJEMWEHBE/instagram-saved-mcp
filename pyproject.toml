@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "instagram-saved-mcp"
-version = "0.1.0"
+version = "0.2.0"
 description = "MCP server that exposes your Instagram Saved posts (from a personal data export) to any MCP client."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -33,7 +33,7 @@ transcribe = ["yt-dlp>=2024.1.1", "faster-whisper>=1.0"]
 dev = ["pytest>=8.0"]
 
 [project.scripts]
-instagram-saved-mcp = "instagram_saved_mcp.server:main"
+instagram-saved-mcp = "instagram_saved_mcp.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/NAJEMWEHBE/instagram-saved-mcp"
