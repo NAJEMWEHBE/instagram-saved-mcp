@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "instagram-saved": {
+      "command": "uvx",
+      "args": ["instagram-saved-mcp"]
+    }
+  }
+}

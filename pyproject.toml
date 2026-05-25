@@ -1,0 +1,49 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "instagram-saved-mcp"
+version = "0.1.0"
+description = "MCP server that exposes your Instagram Saved posts (from a personal data export) to any MCP client."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "NAJEMWEHBE", email = "NAJEMWEHBE@users.noreply.github.com" }]
+keywords = ["mcp", "instagram", "model-context-protocol", "claude", "saved-posts"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "mcp>=1.27",
+    "requests>=2.31",
+    "beautifulsoup4>=4.12",
+]
+
+[project.optional-dependencies]
+# v0.2 transcription stack — heavy (ctranslate2, av, CUDA libs). Opt in with:
+#   uvx instagram-saved-mcp[transcribe]
+transcribe = ["yt-dlp>=2024.1.1", "faster-whisper>=1.0"]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+instagram-saved-mcp = "instagram_saved_mcp.server:main"
+
+# TODO: update these to your real repository before publishing.
+[project.urls]
+Homepage = "https://github.com/yourusername/instagram-saved-mcp"
+Repository = "https://github.com/yourusername/instagram-saved-mcp"
+Issues = "https://github.com/yourusername/instagram-saved-mcp/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/instagram_saved_mcp"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Builds
+build/
+dist/
+
+# Virtual envs
+.venv/
+venv/
+
+# Local cache DB
+*.db
+
+# OS
+.DS_Store
+Thumbs.db
