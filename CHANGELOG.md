@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-05-26
+
+### Added
+- `python -m instagram_saved_mcp` runs the CLI.
+- Test coverage for the enricher (Open Graph parsing, URL validation,
+  login-wall / rate-limit / not-found handling) and the SQLite cache
+  (enrichment preserved on re-import, search, collection listing).
+
+### Changed
+- `publish.yml` uses `skip-existing` for idempotent releases.
+
 ## [0.2.0] - 2026-05-26
 
 ### Added
@@ -31,5 +42,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   collection layout.
 - PyPI packaging (`uvx`-runnable), Windows installer, and client config examples.
 
+[0.2.1]: https://github.com/NAJEMWEHBE/instagram-saved-mcp/releases/tag/v0.2.1
 [0.2.0]: https://github.com/NAJEMWEHBE/instagram-saved-mcp/releases/tag/v0.2.0
 [0.1.0]: https://github.com/NAJEMWEHBE/instagram-saved-mcp/releases/tag/v0.1.0

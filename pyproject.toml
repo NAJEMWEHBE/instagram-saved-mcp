@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "instagram-saved-mcp"
-version = "0.2.0"
+version = "0.2.1"
 description = "MCP server that exposes your Instagram Saved posts (from a personal data export) to any MCP client."
 readme = "README.md"
 requires-python = ">=3.11"
