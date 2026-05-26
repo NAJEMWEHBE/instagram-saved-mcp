@@ -4,12 +4,12 @@ build-backend = "hatchling.build"
 
 [project]
 name = "instagram-saved-mcp"
-version = "0.2.1"
+version = "0.2.2"
 description = "MCP server that exposes your Instagram Saved posts (from a personal data export) to any MCP client."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-authors = [{ name = "NAJEMWEHBE", email = "NAJEMWEHBE@users.noreply.github.com" }]
+authors = [{ name = "NAJEMWEHBE" }]
 keywords = ["mcp", "instagram", "model-context-protocol", "claude", "saved-posts"]
 classifiers = [
     "Development Status :: 4 - Beta",
